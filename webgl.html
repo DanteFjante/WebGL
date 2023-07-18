@@ -4,230 +4,38 @@
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html" charset="utf-8" />
-	<style type="text/css">
-		body {
-			background: linear-gradient(to bottom, #200d01, #221505);
-			color: #e0e0e0;
-			font-family: Arial, sans-serif;
-			padding: 50px, 50px, 50px, 0px;
-			display: flex;
-			justify-content: space-between;
-			overflow-x: hidden;
-		}
-
-		#content {
-			width: 70%;
-		}
-
-		#side-panel {
-			width: auto;
-			margin: 20px, 20px, 20px, 0px;
-			padding: 20px, 20px, 20px, 0px;
-			background: linear-gradient(to bottom, #282828, #383838);
-			transition: transform 0.3s ease-out;
-			position: relative;
-			right: 0;
-			top: 0;
-			border-radius: 10px 10px 10px 10px;
-			box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
-			display: flex;
-			flex-direction: column;
-			justify-content: center;
-			overflow-y: auto;
-			overflow-x: hidden;
-			scrollbar-width: thin;
-			scrollbar-color: #888 #f1f1f1;
-			align-items: end;
-			align-self: flex-start;
-
-		}
-
-		#side-panel.hidden {
-			transform: translateX(150px);
-			/* Adjust the pixel value to your preference */
-		}
-
-		#side-panel.hidden #toggleButton {
-
-			/* flip the arrow when panel is hidden */
-			transform: rotate(180deg);
-		}
-
-		#side-panel>div {
-			margin-bottom: 30px;
-			width: 80%;
-		}
-
-		#side-panel p {
-			text-align: center;
-			color: #fff;
-			font-size: 1.2em;
-		}
-
-		#side-panel input[type=range] {
-			width: 100%;
-			padding: 0px, 0px, 0px, 0px;
-		}
-
-		#side-panel button {
-			padding: 5px;
-			font-size: 1.2em;
-			color: #e0e0e0;
-			background-color: #444;
-			border: none;
-			cursor: pointer;
-			border-radius: 5px;
-			width: 100%;
-			transition: background 0.3s;
-		}
-
-		#side-panel button:hover {
-			background-color: #555;
-		}
-
-		#side-panel::-webkit-scrollbar {
-			width: 10px;
-		}
-
-		#side-panel::-webkit-scrollbar-track {
-			background: #f1f1f1;
-		}
-
-		#side-panel::-webkit-scrollbar-thumb {
-			background: #888;
-		}
-
-		#side-panel::-webkit-scrollbar-thumb:hover {
-			background: #555;
-		}
-
-		#toggleButton {
-			position: absolute;
-			max-width: 25px;
-			min-height: 300px;
-			left: 0px;
-			top: 0px;
-			background: none;
-			border: none;
-			font-size: 2em;
-			color: #fff;
-			cursor: pointer;
-			margin: 0, 20px, 20px, 20px;
-		}
-
-		#controls {
-			display: flex;
-			flex-direction: column;
-			margin-left: 30px;
-		}
-
-		p {
-			font-size: 24px;
-			margin: 0;
-			padding-bottom: 10px;
-		}
-
-		canvas {
-			display: block;
-			margin: 50px auto;
-			background: #282828;
-			border: 1px solid #444;
-		}
-
-		input[type=range] {
-			width: 100%;
-		}
-	</style>
-</head>
-
-
-
-<body onload="init(60)">
-
-	<div id="content">
-		<p><strong>WebGL Viewer</strong></p>
-		<canvas width="600" height="600" id="shader"></canvas>
-		<nav class="navigation">
-			<ul>
-				<li><a href="#"><span>Privacy</span></a></li>
-				<li><a href="#"><span>Sitemap</span></a></li>
-				<li><a href="#"><span>Newsletter</span></a></li>
-				<li class="account"><a href="#"><span>My Account</span></a></li>
-			</ul>
-		</nav>
-		<video id="webcam" autoplay style="display: none;"></video>
-	</div>
-
-	<div id="side-panel" class="hidden float-container">
-		<div class="float-child">
-			<button id="toggleButton" onclick="togglePanel()">&#x2B95;</button>
-		</div>
-		<div id="controls" style="margin-left: 25">
-			<div>
-				<p id="widthDisplay">Width: 600</p>
-				<input type="range" id="widthSlider" min="100" max="1200" value="600" >
-			</div>
-			<div>
-				<p id="heightDisplay">Height: 600</p>
-				<input type="range" id="heightSlider" min="100" max="1000" value="600">
-			</div>
-			<div>
-				<p id="mouseSensitivityDisplay">Mouse Sensitivity: 1.0</p>
-				<input type="range" id="mouseSensitivitySlider" min="0.1" max="3.0" step="0.1" value="1.0">
-			</div>
-			<div>
-				<button id="webcamToggleButton">Toggle Webcam</button>
-			</div>
-			<p id="xOffset">X Offset: 0</p>
-			<input type="range" step=0.0000001 id="xOffsetSlider" min="-4.0" max="4.0" value="0.0" old="0.0">
-			<p id="yOffset">Y Offset: 0</p>
-			<input type="range" step=0.0000001 id="yOffsetSlider" min="-4.0" max="4.0" value="0.0" old="0.0">
-			<p id="zoom">Zoom: 1</p>
-			<input type="range" id="zoomSlider" min="0.1" max="1000" value="1" step="0.001">
-			<button id="updateButton">Refresh</button>
-		</div>
-	</div>
-	<script id="VertexShader" type="x-shader/x-vertex">
+	<link rel="stylesheet" href="css/styles.css">
+	<script type="x-shader/x-vertex" id="vert-shader">
 		#version 300 es
 		//out vec2 UV;
-		void main()
-		{
+		void main() {
 			float x = float((gl_VertexID & 1) << 2);
 			float y = float((gl_VertexID & 2) << 1);
 			gl_Position = vec4(x - 1.0, y - 1.0, 0, 1);
 		}
 	</script>
-	<script id="PixelShader" type="x-shader/x-fragment">
+	<script type="x-shader/x-fragment" id="frag-shader">
 		#version 300 es
-		//in vec2 UV;
 		precision highp float;
-		uniform float iTime;
-		uniform vec2 viewSize;
+		#line 21
+		uniform int iMouse[10];
+		uniform int iKeyboard[6];
+		uniform int iTime[4];
+		uniform ivec2 viewSize;
 		uniform float zoom;
 		uniform vec2 offset;
+		uniform int steps;
 		out vec4 fragColor;
-
-		float minValue = -2.0;
-		float maxValue = 1.0;
-
-
-
-		float calcA(float a, float b, float c) {
-			return (a * a) - (b * b) + pow(c, .2);
-		}
 		
-		float calcB(float a, float b, float c) {
-			return (2. * a * b) + pow(c, .2);
+		vec2 CalculateImaginaryMultiplication(vec2 v, vec2 c) {
+			return vec2(v.x * v.x - v.y * v.y + c.x, 2. * v.x * v.y + c.y);
 		}
 		
 		vec2 fX(vec2 v, vec2 c) {
-			return vec2(
-				calcA(v.x, v.y, c.x),
-				calcB(v.x, v.y, c.y));
+			return CalculateImaginaryMultiplication(v, c);
 		}
-
-		vec2 runFunc(vec2 v, int steps)
-		{
+		
+		vec2 runFunc(vec2 v, int steps) {
 			vec2 ret = fX(v, v);
 			for(int i = 1; i < steps; i++) {
 				ret = fX(ret, v);
@@ -235,323 +43,117 @@
 			return ret;
 		}
 
-		int steps(vec2 v, int maxSteps) {
-
+		
+		int countSteps(vec2 v, int maxSteps) {
+		
 			for(int i = 0; i < maxSteps; i++) {
-			   if(distance(runFunc(v, i), vec2(0.)) > 2.)
-				  return i;
+				if(distance(runFunc(v, i), vec2(0.)) > 2.)
+					return i;
 			}
 			return 0;
 		}
-
+		
 		vec2 getUV() {
-			vec2 uv =  gl_FragCoord.xy / viewSize / zoom + offset;
+			vec2 uv = ((vec2(gl_FragCoord.xy) / vec2(viewSize) / zoom) - (vec2(0.5) / zoom)) + (offset);
+			//uv = uv * zoom + vec2(-0.5) * zoom;
+			//vec2 uv = (gl_FragCoord.xy + getOffset()) / (vec2(viewSize) * zoom) ;
 			return uv;
 		}
-		//Här i main kan du skriva din gl_es kod. 
-		//Den körs direkt i webbläsaren så det är bara att spara och ladda om (hot reload)
-		//Main körs en gång för varje pixel i "fragmentet" så är bilden på helskärm på en normal monitor körs main 1920*1080 gånger per frame
-		// eller 1920*1080*60 (124 416 000) gånger per sekund, datorer är snabba.
-		void main()
-		{
-			vec2 uv = getUV();
+		
+		float lerp(float a, float b, float x) {
+			return (x - a) / (b - a);
+		}
+		
+		vec3 getColor(int steps, int maxSteps) {
+			float x = (0. + float(steps)) / (0. + float(maxSteps));
+			vec3 red = vec3(1.0, 0.0, 0.0);
+			vec3 yellow = vec3(1.0, 1.0, 0.0);
+			vec3 green = vec3(0.0, 1.0, 0.0);
+			vec3 blue = vec3(0.0, 0.0, 1.0);
+
+			vec3 nullColor = vec3(0.0);
 			
-			int st = steps(uv, 32);
-			float r = 1.0, g = 1.0, b = 1.0;
-    
-			if(st%3==0) r = r-0.25;
-			if(st%3==1) g = g-0.25;
-			if(st%3==2) b = b-0.25;
-			
-			if(st%5==0) r = r-0.25;
-			if(st%5==1) g = g-0.25;
-			if(st%5==2) b = b-0.25;
-			
-			if(st%7==0) r = r-0.25;
-			if(st%7==1) g = g-0.25;
-			if(st%7==2) b = b-0.25;
-			
-			if(st%11==0) r = r-0.25;
-			if(st%11==1) g = g-0.25;
-			if(st%11==2) b = b-0.25;
-			
-			if(st%13==0) r = r-0.25;
-			if(st%13==1) g = g-0.25;
-			if(st%13==2) b = b-0.25;
-			
-			if(st == 0) {
-			r = offset.x;
-			g = offset.y;
-			b = 1000./zoom;
+			if(x > .80){
+				return mix(blue, red, (x - .8) * 5.);
 			}
 			
-			vec3 col = vec3(r,g,b);
+			if(x > .60){
+				return mix(green, blue, (x - .6) * 5.);
+			} 
 			
+			if(x > .40){
+				return mix(yellow, green, (x - .4) * 5.);
+			}
+			
+			if(x > .20){
+				return mix(red, yellow, (x -.2) * 5.);
+			} 
+			
+			return mix(nullColor, red, x * 5.);
+		}
+				
+		void main() {
+			
+			vec2 uv = getUV();
+		
+			int st = countSteps(uv, steps);
 
+			//st = (st + int(float(iTime[1]) / 100.)) % steps;
 
-
+			vec3 col = getColor(st, steps);
+		
 			fragColor = vec4(col, 1.0);
 		}
-
-
-		</script>
-
-	<script type="text/javascript">
-		var canvas;
-		var gl;
-		var vertexshader;
-		var pixelshader;
-		var program;
-
-		/**
-			[0] = Time in milliseconds when started, 
-			[1] = Time now, 
-			[2] = Current Time, 
-			[3] = Current Date, 
-
-		*/
-
-		var startTime = new Date().getMilliseconds();
-		var iTime = [startTime - new Date().getMilliseconds(), startTime - new Date().getMilliseconds(), new Date().getTime(), , new Date().getDate()];
-
-		/**
-			[0] = Key, 
-			[1] = Key Action, 
-			[2] = Control pressed, 
-			[3] = Shift pressed, 
-			[4] = Alt pressed, 
-			[5] = Caps Lock pressed
-		*/
-		var iKeyboard = [0, 0, 0, 0, 0, 0];
-
-		/**
-		[0] = X position, 
-		[1] = Y position, 
-		[2] = mouse click x position,
-		[3] = mouse click y position, 
-		[4] = left click, 
-		[5] = middle click, 
-		[6] = right click,  
-		[7] =  double click,
-		[8] = scroll horizontal,
-		[9] = scroll vertical,
-		[10] = mouse sensitivity, 
-		[11] = mouse inside window 
-		*/
-		var iMouse = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-
-		var video = document.getElementById('webcam');
-
-		function addMouseEventListeners() {
-			// Mouse input
-			window.addEventListener('mousemove', function (event) {
-				var sensitivity = document.getElementById('mouseSensitivitySlider').value;
-				var x = event.clientX * sensitivity;
-				var y = event.clientY * sensitivity;
-				console.log('Mouse position: ' + x + ', ' + y);
-				updateiMouse(0, x);
-				updateiMouse(1, y);
-			});
-
-			// Mouse input
-			window.addEventListener('mousedown', function (event) {
-				var x = event.clientX;
-				var y = event.clientY;
-				console.log('Mouse position: ' + x + ', ' + y);
-				updateiMouse(2, x);
-				updateiMouse(3, y);
-				updateiMouse(4, event.button);
-			});
-		}
-
-		function addKeyboardListeners() {
-			// Keyboard input
-			window.addEventListener('keydown', function (event) {
-				console.log('Key down: ' + event.key);
-				iKeyboardButton = event.key;
-				iKeyboardAction = 1;
-			});
-			// Keyboard input
-			window.addEventListener('keyup', function (event) {
-				console.log('Key Released: ' + event.key);
-				iKeyboardButton = event.key;
-				iKeyboardAction = 0;
-			});
-		}
-
-		function addEventListener() {
-			addMouseEventListeners();
-
-
-
-		}
-
-		function togglePanel() {
-			var panel = document.getElementById("side-panel");
-			panel.classList.toggle("hidden");
-		}
-
-		function updateiMouse(index, value) {
-			iMouse[index] = value;
-		}
-
-
-		function init() {
-			time = 0;
-
-			canvas = document.getElementById('shader');
-			updateCanvasSize();
-
-			gl = canvas.getContext('webgl2', { antialias: false });
-
-			//The vertexShader gets initialized
-			vertexshader = gl.createShader(gl.VERTEX_SHADER);
-
-			gl.shaderSource(vertexshader, document.getElementById("VertexShader").textContent.replace(/^\s+|\s+$/g, ''));
-			gl.compileShader(vertexshader);
-
-			//The fragshader gets initialized
-			pixelshader = gl.createShader(gl.FRAGMENT_SHADER);
-
-			gl.shaderSource(pixelshader, document.getElementById("PixelShader").textContent.replace(/^\s+|\s+$/g, ''));
-			gl.compileShader(pixelshader);
-
-			//The program gets initialized
-			program = gl.createProgram();
-			gl.attachShader(program, vertexshader);
-			gl.attachShader(program, pixelshader);
-
-			//The program gets used
-			gl.linkProgram(program);
-			if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-				alert("Could not initialise shaders");
-			}
-			gl.useProgram(program);
-
-
-			// Add a dummy VAO
-			var vao = gl.createVertexArray();
-			gl.bindVertexArray(vao);
-
-			// Add a dummy VBO
-			var buffer = gl.createBuffer();
-			gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-			gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0, 0, 0, 1, 1, 1]), gl.STATIC_DRAW);
-
-			window.requestAnimFrame = (function () {
-				return window.requestAnimationFrame || function (callback) { window.setTimeout(callback, 1000 / 60); };
-			})();
-
-
-			document.getElementById('mouseSensitivitySlider').oninput = function () {
-				document.getElementById('mouseSensitivityDisplay').innerText = "Mouse Sensitivity: " + this.value;
-			}
-
-			document.getElementById("xOffsetSlider").oninput = function () {
-				document.getElementById("xOffset").innerText = "X Offset: " + this.value;
-				this.setAttribute("old", this.value);
-				loop();
-			}
-
-			document.getElementById("yOffsetSlider").oninput = function () {
-				document.getElementById("yOffset").innerText = "Y Offset: " + this.value;
-				this.setAttribute("old", this.value);
-				loop();
-			}
-
-			document.getElementById("zoomSlider").oninput = function () {
-				document.getElementById("zoom").innerText = "Zoom: " + this.value;
-				var xSlider = document.getElementById("xOffsetSlider");
-				var ySlider = document.getElementById("yOffsetSlider");
-				
-				var offset = 4 * (1 / this.value);
-				var newXmin = parseFloat(xSlider.value) - offset;
-				var newXmax = parseFloat(xSlider.value) + offset;
-				var newYmin = parseFloat(ySlider.value) - offset;
-				var newYmax = parseFloat(ySlider.value) + offset;
-
-				xSlider.setAttribute("min", newXmin);
-				xSlider.setAttribute("max", newXmax);
-				
-				ySlider.setAttribute("min", newXmin);
-				ySlider.setAttribute("max", newXmax);
-
-				loop();
-			}
-
-			document.getElementById("updateButton").onclick = function() {
-				loop();
-			}
-
-			// Webcam input
-			var webcam = document.getElementById('webcam');
-			var webcamToggleButton = document.getElementById('webcamToggleButton');
-
-			webcamToggleButton.addEventListener('click', function () {
-				if (webcam.srcObject && webcam.srcObject.active) {
-					// Stop all tracks
-					webcam.srcObject.getTracks().forEach(track => track.stop());
-				} else {
-					// Start video stream if the browser supports it
-					if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-						navigator.mediaDevices.getUserMedia({ video: true }).then(function (stream) {
-							webcam.srcObject = stream;
-							webcam.play();
-						}).catch(function (error) {
-							console.log('Error accessing webcam: ', error);
-						});
-					} else {
-						console.log('Webcam not supported by this browser.');
-					}
-				}
-			});
-
-			loop();
-		}
-
-		function updateCanvasSize() {
-			const widthSlider = document.getElementById('widthSlider');
-			const heightSlider = document.getElementById('heightSlider');
-			const widthDisplay = document.getElementById('widthDisplay');
-			const heightDisplay = document.getElementById('heightDisplay');
-
-			widthSlider.oninput = function () {
-				canvas.width = this.value;
-				widthDisplay.innerText = "Width: " + this.value;
-				gl.viewport(0, 0, canvas.width, canvas.height);
-			}
-
-			heightSlider.oninput = function () {
-				canvas.height = this.value;
-				heightDisplay.innerText = "Height: " + this.value;
-				gl.viewport(0, 0, canvas.width, canvas.height);
-			}
-		}
-
-		function loop() {
-
-			time += 1 / 60;
-
-			var width = document.getElementById("shader").getAttribute("width");
-			var height = document.getElementById("shader").getAttribute("height");
-
-			xSlider = document.getElementById('xOffsetSlider');
-			ySlider = document.getElementById('yOffsetSlider');
-			zoomSlider = document.getElementById('zoomSlider');
-			
-
-			var xOffset = parseFloat(xSlider.value);
-			var yOffset = parseFloat(ySlider.value);
-			var zoom = parseFloat(zoomSlider.value);
-
-			gl.uniform1f(gl.getUniformLocation(program, "iTime"), time);
-			gl.uniform2f(gl.getUniformLocation(program, "viewSize"), width, height);
-			gl.uniform2f(gl.getUniformLocation(program, "offset"), xOffset, yOffset);
-			gl.uniform1f(gl.getUniformLocation(program, "zoom"), zoom);
-			gl.drawArrays(gl.TRIANGLES, 0, 6);
-		}
-
 	</script>
+	<script src="js/main.js" id="main"></script>
+	<script src="js/eventHandlers.js" id="eventHandlers"></script>
+</head>
+
+
+<!--onload should init with event as parameter-->
+<body onload="init(event)">
+
+	<div id="content">
+		<p><strong>WebGL Viewer</strong></p>
+		<canvas width="600" height="600" id="shader" 
+		onmousedown="onMouseDown(event)"
+		onmousemove="onMouseMove(event)"
+		onmouseup="onMouseUp(event)"
+		onmousewheel="onMouseWheel(event)"
+		onkeydown="onKeyDown(event)"
+		onkeyup="onKeyUp(event)"
+		></canvas>
+		<video id="webcam" autoplay style="display: none;"></video>
+	</div>
+
+	<div id="side-panel" class="hidden float-container">
+
+		<button id="toggleButton" onclick="onTogglePanel(event)">&#x2B95;</button>
+
+		<div id="controls" class="content">
+			<div>
+				<p id="stepsDisplay">Steps: 24</p>
+				<input type="range" id="stepsSlider" min="1" max="200" value="24" oninput="onStepSlider(event)">
+			</div>
+			<div>
+				<p id="widthDisplay">Width: 600</p>
+				<input type="range" id="widthSlider" min="100" max="1200" value="600" oninput="onWidthSlider(event)">
+			</div>
+			<div>
+				<p id="heightDisplay">Height: 600</p>
+				<input type="range" id="heightSlider" min="100" max="1000" value="600" oninput="onHeightSlider(event)">
+			</div>
+			<div>
+				<button id="webcamToggleButton" onclick="onToggleWebcam(event)">Toggle Webcam</button>
+			</div>
+			<p id="xOffset">X Offset: 0</p>
+			<input type="range" step=0.0000001 id="xOffsetSlider" min="-1" max="1" value="0.0" onchange="onXSlider(event)">
+			<p id="yOffset">Y Offset: 0</p>
+			<input type="range" step=0.0000001 id="yOffsetSlider" min="-1" max="1" value="0.0" onchange="onYSlider(event)">
+			<p id="zoomDisplay">Zoom: 0</p>
+			<input type="range" id="zoomSlider" min="-1" max="1" value="0" step="0.001" onchange="onZoomSlider(event)">
+		</div>
+	</div>
 </body>
 
 </html>

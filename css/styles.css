@@ -1,0 +1,131 @@
+body {
+    background: linear-gradient(to bottom, #200d01, #221505);
+    color: #e0e0e0;
+    font-family: Arial, sans-serif;
+    padding: 50px, 50px, 50px, 0px;
+    display: flex;
+    justify-content: space-between;
+    overflow-x: hidden;
+}
+
+#side-panel {
+    width: 250px;
+    height: 100%;
+
+    background: linear-gradient(to bottom, #282828, #383838);
+    transition: transform 0.3s ease-out;
+    position: relative;
+    right: 0;
+    top: 0;
+    border-radius: 10px 10px 10px 10px;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+    align-items: end;
+    align-self: flex-start;
+
+}
+
+
+#side-panel.hidden {
+    transform: translateX(210px);
+    /* Adjust the pixel value to your preference */
+}
+
+#side-panel.hidden #toggleButton {
+
+    /* flip the arrow when panel is hidden */
+    transform: rotate(180deg);
+}
+
+#side-panel p {
+    text-align: center;
+    color: #fff;
+    font-size: 100%;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    margin-left: 5px;
+    margin-right: 10px;
+}
+
+#side-panel input[type=range] {
+    width: 90%;
+    accent-color: beige;
+}
+
+#side-panel button {
+    padding: 5px;
+    font-size: 1.2em;
+    color: #e0e0e0;
+    background-color: #444;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    width: 90%;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    transition: background 0.3s;
+    background-color: #444
+}
+
+#side-panel button:hover {
+    background-color: #555;
+}
+
+#side-panel::-webkit-scrollbar {
+    width: 10px;
+}
+
+#side-panel::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#side-panel::-webkit-scrollbar-thumb {
+    background: #888;
+}
+
+#side-panel::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+#toggleButton {
+    position: absolute;
+    max-width: 25px;
+    height: 100%;
+    left: 0px;
+    top: 0px;
+    background: none;
+    border: none;
+    font-size: 2em;
+    color: #fff;
+    cursor: pointer;
+    margin: 0px;
+}
+
+#controls {
+    display: flex;
+    flex-direction: column;
+    margin-left: 30px;
+}
+
+p {
+    font-size: 24px;
+    margin: 0;
+    padding-bottom: 10px;
+}
+
+canvas {
+    display: block;
+    margin: 50px auto;
+    background: #282828;
+    border: 1px solid #444;
+}
+
+input[type=range] {
+    width: 100%;
+}
